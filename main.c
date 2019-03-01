@@ -19,6 +19,9 @@ int main(int argc, char **argv) {
 
   print_matrix(make_translate(1,2,3)); //For Testing!
   print_matrix(make_scale(1,2,3)); //For Testing!
+  print_matrix(make_rotX(180)); //For Testing!
+  print_matrix(make_rotY(180)); //For Testing!
+  print_matrix(make_rotZ(180)); //For Testing!
 
   /*
   if ( argc == 2 )
