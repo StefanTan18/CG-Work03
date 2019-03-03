@@ -61,6 +61,11 @@ void parse_file ( char * filename,
   char line[256];
   clear_screen(s);
 
+  color c;
+  c.red = 0;
+  c.green = MAX_COLOR;
+  c.blue = 0;
+
   if ( strcmp(filename, "stdin") == 0 ) 
     f = stdin;
   else
@@ -69,6 +74,120 @@ void parse_file ( char * filename,
   while ( fgets(line, 255, f) != NULL ) {
     line[strlen(line)-1]='\0';
     printf(":%s:\n",line);
+
+    if (!strcmp(line, "line")) {
+      char *buffer, *args;
+
+      buffer = malloc(100);
+      fgets(buffer, 100, f);
+      
+      args = calloc(10, sizeof(double));
+      
+      for(int i = 0; buffer; i++) {
+	args[i] = (double) atoi(strsep(&buffer, " "));
+      }
+      
+      add_edge(edges, args[0], args[1], args[2], args[3], args[4], args[5]);
+
+      free(buffer);
+      free(args);
+    }
+    else if (!strcmp(line, "ident")) {
+      ident(transform);
+    }
+    else if (!strcmp(line, "scale")) {
+      char *buffer;
+      double *args;
+      struct matrix *m;
+
+      buffer = malloc(100);
+      fgets(buffer, 100, f);
+      
+      args = calloc(10, sizeof(double));
+
+      for(int i = 0; buffer; i++) {
+	args[i] = (double) atoi(strsep(&buffer, " "));
+      }
+
+      m = make_scale(args[0], args[1], args[2]);
+      
+      matrix_mult(m, transform);
+
+      free(buffer);
+      free(args);
+    }
+    else if (!strcmp(line, "move")) {
+      char *buffer;
+      double *args;
+      struct matrix *m;
+
+      buffer = malloc(100);
+      fgets(buffer, 100, f);
+
+      args = calloc(10, sizeof(double));
+      
+      for(int i = 0; buffer; i++) {
+	args[i] = (double) atoi(strsep(&buffer, " "));
+      }
+      
+      m = make_translate(args[0], args[1], args[2]);
+      
+      matrix_mult(m, transform);
+
+      free(buffer);
+      free(args);
+    }
+    else if (!strcmp(line, "rotate")) {
+      char *buffer, *aor;
+      double theta;
+      struct matrix *m;
+      
+      buffer = malloc(100);
+      fgets(buffer, 100, f);
+
+      aor = malloc(100);
+      strcpy(aor, strsep(&buffer, " "));
+      
+      theta = (double) atoi(strsep(&buffer, " "));
+      
+      if (!strcmp(aor, "x")) {
+	m = make_rotX(theta);
+      }
+      else if (!strcmp(aor, "y")) {
+	m = make_rotY(theta);
+      }
+      else if (!strcmp(aor, "z")) {
+	m = make_rotZ(theta);
+      }
+
+      matrix_mult(m, transform);
+
+      free(buffer);
+      free(aor);
+    }
+    else if (!strcmp(line, "apply")) {
+      matrix_mult(transform, edges);
+    }
+    else if (!strcmp(line, "display")) {
+      clear_screen(s);
+      draw_lines(edges, s, c);
+      display(s);
+    }
+    else if (!strcmp(line, "save")) {
+      char *filename;
+
+      filename = malloc(100);
+      fgets(filename, 100, f);
+      filename[strlen(filename)-1]='\0';
+      
+      clear_screen(s);
+      draw_lines(edges, s, c);
+      save_extension(s, filename);
+      free(filename);
+    }
+    else if (!strcmp(line, "quit")) {
+      fseek(f, 0, SEEK_END);
+    }
   }
 }
   

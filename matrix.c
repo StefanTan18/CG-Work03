@@ -13,7 +13,6 @@
 
 #include "matrix.h"
 
-#define PI 3.14159265
 
 /*======== struct matrix * make_translate() ==========
 Inputs:  int x
@@ -45,25 +44,14 @@ as the scale factors
 ====================*/
 struct matrix * make_scale(double x, double y, double z) {
   struct matrix *m;
-  int r, c;
-
+  
   m = new_matrix(4, 4);
   
-  for (r=0; r < m->rows; r++) 
-    for (c=0; c < m->cols; c++) 
-      if ( r == c ) {
-	if(r == 0)
-	  m->m[r][c] = x;
-	else if(r == 1)
-	  m->m[r][c] = y;
-	else if(r == 2)
-	  m->m[r][c] = z;
-	else
-	  m->m[r][c] = 1;
-      }
-      else
-	m->m[r][c] = 0;
-  m->lastcol = m->cols;
+  ident(m);
+  
+  m->m[0][0] = x;
+  m->m[1][1] = y;
+  m->m[2][2] = z;
   
   return m;
 }
@@ -76,25 +64,17 @@ angle of rotation and X as the axis of rotation.
 ====================*/
 struct matrix * make_rotX(double theta) {
   struct matrix *m;
-  double rad; //ALL ROTATIONS DONT WORK
-  int r, c;
+  double rad;
   
   m = new_matrix(4, 4);
-  rad = theta * (PI / 180);
+  rad = theta * (M_PI / 180);
+
+  ident(m);
   
-  m = new_matrix(4, 4);
-  
-  for (r=0; r < m->rows; r++) 
-    for (c=0; c < m->cols; c++) {
-      if (r == c && r > 0 && r < 3) 
-	m->m[r][c] = cos(rad);
-      else if (r == c)
-	m->m[r][c] = 1;
-      else if (r == 2 && c == 1)
-	m->m[r][c] = sin(rad);
-      else if (r == 1 && c == 2)
-	m->m[r][c] = -(sin(rad));
-    }
+  m->m[1][1] = cos(rad);
+  m->m[1][2] = -(sin(rad));
+  m->m[2][1] = sin(rad);
+  m->m[2][2] = cos(rad);
   
   return m;
 }
@@ -108,24 +88,16 @@ angle of rotation and Y as the axis of rotation.
 struct matrix * make_rotY(double theta) {
   struct matrix *m;
   double rad;
-  int r, c;
   
   m = new_matrix(4, 4);
-  rad = theta * (PI / 180);
+  rad = theta * (M_PI / 180);
   
-  m = new_matrix(4, 4);
+  ident(m);
   
-  for (r=0; r < m->rows; r++) 
-    for (c=0; c < m->cols; c++) {
-      if (r == c && r == 0 && r == 2) 
-	m->m[r][c] = cos(rad);
-      else if (r == c)
-	m->m[r][c] = 1;
-      else if (r == 0 && c == 2)
-	m->m[r][c] = sin(rad);
-      else if (r == 2 && c == 0)
-	m->m[r][c] = -(sin(rad));
-    }
+  m->m[0][0] = cos(rad);
+  m->m[0][2] = sin(rad);
+  m->m[2][0] = -(sin(rad));
+  m->m[2][2] = cos(rad);
   
   return m;
 }
@@ -139,24 +111,16 @@ angle of rotation and Z as the axis of rotation.
 struct matrix * make_rotZ(double theta) {
   struct matrix *m;
   double rad;
-  int r, c;
   
   m = new_matrix(4, 4);
-  rad = theta * (PI / 180);
+  rad = theta * (M_PI / 180);
   
-  m = new_matrix(4, 4);
+  ident(m);
   
-  for (r=0; r < m->rows; r++) 
-    for (c=0; c < m->cols; c++) {
-      if (r == c && r < 2) 
-	m->m[r][c] = cos(rad);
-      else if (r == c)
-	m->m[r][c] = 1;
-      else if (r == 0 && c == 1)
-	m->m[r][c] = -(sin(rad));
-      else if (r == 1 && c == 0)
-	m->m[r][c] = sin(rad);
-    }
+  m->m[0][0] = cos(rad);
+  m->m[0][1] = -(sin(rad));
+  m->m[1][0] = sin(rad);
+  m->m[1][1] = cos(rad);
   
   return m;
 }
